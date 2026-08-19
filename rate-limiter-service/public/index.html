@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rate Limiter Dashboard</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #111;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+  }
+  h1 { margin-bottom: 5px; }
+  #bucket {
+    width: 300px;
+    height: 60px;
+    border: 3px solid #444;
+    border-radius: 8px;
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
+    background: #222;
+  }
+  #fill {
+    height: 100%;
+    background: #22c55e;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+  #label {
+    margin-top: 15px;
+    font-size: 20px;
+  }
+  button {
+    margin-top: 25px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    background: #3b82f6;
+    color: white;
+  }
+  button:disabled { background: #555; cursor: not-allowed; }
+  #log {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #999;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 300px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Token Bucket — Live</h1>
+<div id="bucket"><div id="fill"></div></div>
+<div id="label">Loading...</div>
+<button id="hitBtn">Hit API</button>
+<div id="log"></div>
+
+<script>
+  const fillEl = document.getElementById('fill');
+  const labelEl = document.getElementById('label');
+  const btnEl = document.getElementById('hitBtn');
+  const logEl = document.getElementById('log');
+
+  function log(msg) {
+    const line = document.createElement('div');
+    line.textContent = msg;
+    logEl.prepend(line);
+  }
+
+  async function refreshStatus() {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    const pct = (data.tokens / data.capacity) * 100;
+    fillEl.style.width = pct + '%';
+    fillEl.style.background = pct < 20 ? '#ef4444' : pct < 50 ? '#f59e0b' : '#22c55e';
+    labelEl.textContent = `${data.tokens} / ${data.capacity} tokens`;
+  }
+
+  async function hitApi() {
+    btnEl.disabled = true;
+    const res = await fetch('/api/data');
+    if (res.status === 200) {
+      log('✅ 200 — request allowed');
+    } else {
+      log('🚫 429 — blocked, too many requests');
+    }
+    await refreshStatus();
+    btnEl.disabled = false;
+  }
+
+  btnEl.addEventListener('click', hitApi);
+
+  refreshStatus();
+  setInterval(refreshStatus, 1000); // auto-refresh, shows refill happening even without clicking
+</script>
+
+</body>
+</html>
