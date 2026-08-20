@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Signup — Job Queue Demo</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #111;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+  }
+  input {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 250px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #222;
+    color: #eee;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    background: #3b82f6;
+    color: white;
+    margin-top: 10px;
+  }
+  #status { margin-top: 20px; font-size: 14px; color: #22c55e; }
+  a { color: #60a5fa; margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<h2>Signup (Job Queue Demo)</h2>
+<input id="name" placeholder="Name" />
+<input id="email" placeholder="Email" />
+<button id="submitBtn">Sign Up</button>
+<div id="status"></div>
+<a href="/admin/queues" target="_blank">Open Queue Dashboard →</a>
+
+<script>
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const statusEl = document.getElementById('status');
+
+    const start = Date.now();
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+    const elapsed = Date.now() - start;
+
+    if (res.ok) {
+      statusEl.textContent = `✅ Signed up in ${elapsed}ms — email job queued (check dashboard)`;
+    } else {
+      statusEl.textContent = `❌ Error`;
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "job-queue-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "nodemon src/server.js",
+    "dev:worker": "nodemon src/worker.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@bull-board/api": "^9.3.2",
+    "@bull-board/express": "^9.3.2",
+    "bullmq": "^6.1.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ioredis": "^6.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
